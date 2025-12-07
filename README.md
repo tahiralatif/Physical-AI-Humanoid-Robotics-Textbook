@@ -15,8 +15,8 @@ Follow these instructions to set up the project locally.
 
 1.  Clone the repository (if you haven't already):
     ```bash
-    git clone https://github.com/tahiralatif/physical-ai-humanoid-roboticsMake.git
-    cd physical-ai-humanoid-roboticsMake
+    git clone https://github.com/YOUR_USERNAME/Physical-AI-Humanoid-Robotics-Textbook.git
+    cd Physical-AI-Humanoid-Robotics-Textbook
     ```
 
 2.  Navigate to the `docusaurus` directory:
