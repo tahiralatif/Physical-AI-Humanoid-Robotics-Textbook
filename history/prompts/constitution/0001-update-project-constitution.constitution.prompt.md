@@ -1,3 +1,32 @@
+---
+id: 0001
+title: Update Project Constitution
+stage: constitution
+date: 2025-12-06
+surface: agent
+model: claude-sonnet-4-5-20250929
+feature: none
+branch: master
+user: Tahira Rajput
+command: /sp.constitution
+labels: ["project constitution", "governance", "documentation"]
+links:
+  spec: null
+  ticket: null
+  adr: null
+  pr: null
+files:
+  - .specify/memory/constitution.md
+  - .specify/templates/plan-template.md
+  - .specify/templates/spec-template.md
+  - .specify/templates/tasks-template.md
+  - CLAUDE.md
+tests:
+  - none
+---
+
+## Prompt
+
 <!--
 
 SYNC IMPACT REPORT - Constitution v1.0.0
