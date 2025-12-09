@@ -1,83 +1,44 @@
-from openai import OpenAI
-from app.services.retrieval_service import retrieval_service
-import os
+from app.services.openai_service import openai_service
+from app.services.qdrant_client import vector_store
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+COLLECTION_NAME = "textbook_chunks"
 
-class ChatbotService:
-    def __init__(self):
-        self.retrieval = retrieval_service
+async def generate_rag_response(query: str, session_id: str, history: list = None):
+    # 1. Generate embedding for query
+    query_vector = await openai_service.get_embedding(query)
     
-    def generate_response(self, query: str, conversation_history: list = None):
-        """Generate chatbot response with RAG"""
-        
-        # Get relevant chunks
-        relevant_chunks = self.retrieval.search_relevant_chunks(query, limit=5)
-        
-        if not relevant_chunks:
-            return {
-                "response": "I couldn't find relevant information in the textbook to answer your question. Please try rephrasing or ask about topics covered in the Physical AI and Robotics course.",
-                "sources": [],
-                "can_answer": False
-            }
-        
-        # Build context from chunks
-        context = "\n\n".join([
-            f"Source: {chunk['source']}\n{chunk['text']}" 
-            for chunk in relevant_chunks
-        ])
-        
-        # Build conversation history
-        messages = [
-            {
-                "role": "system",
-                "content": f"""You are a helpful AI assistant for the Physical AI & Humanoid Robotics textbook. 
-                
-Use the following context from the textbook to answer questions:
-
-{context}
-
-Guidelines:
-- Only answer questions based on the provided context
-- If the context doesn't contain relevant information, say so clearly
-- Always cite sources by mentioning the chapter/section
-- Be concise but thorough
-- Use technical terms appropriately for the audience level"""
-            }
-        ]
-        
-        # Add conversation history
-        if conversation_history:
-            messages.extend(conversation_history[-10:])  # Last 10 messages
-        
-        messages.append({"role": "user", "content": query})
-        
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=messages,
-                max_tokens=500,
-                temperature=0.7
-            )
+    # 2. Retrieve relevant chunks from Qdrant
+    search_results = vector_store.search(COLLECTION_NAME, query_vector, limit=3)
+    
+    # 3. Construct context
+    context_text = ""
+    sources = []
+    
+    for result in search_results:
+        payload = result.payload
+        content = payload.get("content", "")
+        source = payload.get("source", "Unknown")
+        context_text += f"\n---\nSource: {source}\nContent: {content}\n"
+        if source not in sources:
+            sources.append(source)
             
-            return {
-                "response": response.choices[0].message.content,
-                "sources": [
-                    {
-                        "chapter_id": chunk["chapter_id"],
-                        "source": chunk["source"],
-                        "score": chunk["score"]
-                    }
-                    for chunk in relevant_chunks
-                ],
-                "can_answer": True
-            }
-            
-        except Exception as e:
-            return {
-                "response": f"Sorry, I encountered an error: {str(e)}",
-                "sources": [],
-                "can_answer": False
-            }
-
-chatbot_service = ChatbotService()
+    # 4. Construct Prompt
+    system_prompt = """You are an AI assistant for a Physical AI and Humanoid Robotics textbook.
+    Answer the user's question based ONLY on the provided context.
+    If the answer is not in the context, say "I couldn't find the answer in the textbook."
+    Include citations to the source chapters where appropriate.
+    """
+    
+    # 5. Generate Response (OpenAI Chat Format)
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"Context:\n{context_text}\n\nUser Question: {query}"}
+    ]
+    
+    answer = await openai_service.generate_chat_response(messages)
+    
+    return {
+        "answer": answer,
+        "sources": sources,
+        "context_used": context_text
+    }

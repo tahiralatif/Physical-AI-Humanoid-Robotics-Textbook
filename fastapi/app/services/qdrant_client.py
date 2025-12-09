@@ -1,56 +1,60 @@
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
 import os
+from qdrant_client import QdrantClient
+from qdrant_client.http import models
 from dotenv import load_dotenv
 
 load_dotenv()
 
-class QdrantService:
+QDRANT_URL = os.getenv("QDRANT_URL")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+
+class VectorStore:
     def __init__(self):
-        self.client = QdrantClient(
-            url=os.getenv("QDRANT_URL"),
-            api_key=os.getenv("QDRANT_API_KEY")
-        )
-        self.collection_name = "textbook_chunks"
-    
-    def create_collection(self):
-        """Create textbook_chunks collection if it doesn't exist"""
-        try:
-            self.client.create_collection(
-                collection_name=self.collection_name,
-                vectors_config=VectorParams(size=1536, distance=Distance.COSINE)
+        if QDRANT_URL and QDRANT_API_KEY:
+            self.client = QdrantClient(
+                url=QDRANT_URL,
+                api_key=QDRANT_API_KEY,
             )
-            print(f"Collection {self.collection_name} created successfully")
-        except Exception as e:
-            print(f"Collection might already exist: {e}")
-    
-    def upsert_chunks(self, chunks_data):
-        """Insert textbook chunks with embeddings"""
-        points = []
-        for i, chunk in enumerate(chunks_data):
-            points.append(PointStruct(
-                id=i,
-                vector=chunk["embedding"],
-                payload={
-                    "text": chunk["text"],
-                    "chapter_id": chunk["chapter_id"],
-                    "section": chunk["section"],
-                    "source": chunk["source"]
-                }
-            ))
+        else:
+            self.client = None
+            print("Warning: Qdrant credentials not found.")
+
+    def create_collection(self, collection_name: str, vector_size: int = 768):
+        """Creates a collection if it doesn't exist. Default size 768 for Gemini."""
+        if not self.client:
+            return
+
+        try:
+            self.client.get_collection(collection_name=collection_name)
+            print(f"Collection '{collection_name}' already exists.")
+        except Exception:
+            print(f"Creating collection '{collection_name}' with size {vector_size}...")
+            self.client.create_collection(
+                collection_name=collection_name,
+                vectors_config=models.VectorParams(
+                    size=vector_size, 
+                    distance=models.Distance.COSINE
+                ),
+            )
+            print("Collection created successfully.")
+
+    def upsert_points(self, collection_name: str, points: list[models.PointStruct]):
+        if not self.client:
+            return
         
         self.client.upsert(
-            collection_name=self.collection_name,
+            collection_name=collection_name,
             points=points
         )
-    
-    def search_similar(self, query_embedding, limit=5):
-        """Search for similar chunks"""
-        results = self.client.search(
-            collection_name=self.collection_name,
-            query_vector=query_embedding,
+
+    def search(self, collection_name: str, query_vector: list[float], limit: int = 5):
+        if not self.client:
+            return []
+            
+        return self.client.search(
+            collection_name=collection_name,
+            query_vector=query_vector,
             limit=limit
         )
-        return results
 
-qdrant_service = QdrantService()
+vector_store = VectorStore()

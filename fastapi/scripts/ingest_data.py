@@ -1,89 +1,73 @@
 import os
 import sys
+import asyncio
+from pathlib import Path
+from qdrant_client.http import models
+import uuid
+
+# Add parent directory to path to import app modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from openai import OpenAI
-from app.qdrant_client import qdrant_manager
-import glob
-import re
-from dotenv import load_dotenv
+from app.services.openai_service import openai_service
+from app.services.qdrant_client import vector_store
 
-load_dotenv()
+DOCS_DIR = r"E:\Documents\quarter_04\hackathon\Physical-AI-Humanoid-Robotics-Textbook\docusaurus\docs"
+COLLECTION_NAME = "textbook_chunks"
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-def chunk_text(text, chunk_size=1000, overlap=200):
-    """Split text into overlapping chunks"""
-    chunks = []
-    start = 0
-    while start < len(text):
-        end = start + chunk_size
-        chunk = text[start:end]
-        chunks.append(chunk)
-        start = end - overlap
-    return chunks
-
-def get_embedding(text):
-    """Get OpenAI embedding for text"""
+async def process_file(file_path: Path):
     try:
-        response = client.embeddings.create(
-            model="text-embedding-3-small",
-            input=text
-        )
-        return response.data[0].embedding
+        content = file_path.read_text(encoding="utf-8")
+        # Simple chunking by paragraph/headers for now
+        # A more robust splitter would be better for production
+        chunks = [c.strip() for c in content.split("\n\n") if c.strip() and len(c) > 50]
+        
+        chunk_points = []
+        for i, chunk in enumerate(chunks):
+            # Include some metadata in embedding content for better context
+            embedding_content = chunk
+            
+            vector = await openai_service.get_embedding(embedding_content)
+            
+            point = models.PointStruct(
+                id=str(uuid.uuid4()),
+                vector=vector,
+                payload={
+                    "content": chunk,
+                    "source": str(file_path.name),
+                    "path": str(file_path),
+                    "chunk_index": i
+                }
+            )
+            chunk_points.append(point)
+            
+        if chunk_points:
+            vector_store.upsert_points(COLLECTION_NAME, chunk_points)
+            print(f"Uploaded {len(chunk_points)} chunks from {file_path.name}")
+            
     except Exception as e:
-        print(f"Error getting embedding: {e}")
-        return None
+        print(f"Error processing {file_path}: {e}")
 
-def process_markdown_files():
-    """Process all markdown files in docusaurus/docs"""
-    docs_path = "../docusaurus/docs"
-    md_files = glob.glob(f"{docs_path}/**/*.md", recursive=True)
+async def main():
+    print("Starting ingestion...")
     
-    all_chunks = []
+    # 1. Ensure collection exists with correct dimension (768 for Gemini text-embedding-004)
+    vector_store.create_collection(COLLECTION_NAME, vector_size=768)
     
-    for file_path in md_files:
-        print(f"Processing: {file_path}")
-        
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        # Extract chapter info from path
-        relative_path = os.path.relpath(file_path, docs_path)
-        chapter_id = relative_path.replace('\\', '/').replace('.md', '')
-        
-        # Remove frontmatter
-        content = re.sub(r'^---.*?---\s*', '', content, flags=re.DOTALL)
-        
-        # Split into chunks
-        text_chunks = chunk_text(content)
-        
-        for i, chunk in enumerate(text_chunks):
-            if len(chunk.strip()) < 50:  # Skip very small chunks
-                continue
-                
-            embedding = get_embedding(chunk)
-            if embedding:
-                all_chunks.append({
-                    "text": chunk,
-                    "embedding": embedding,
-                    "chapter_id": chapter_id,
-                    "section": f"chunk_{i}",
-                    "source": relative_path
-                })
+    # 2. Walk through docs
+    tasks = []
+    for root, _, files in os.walk(DOCS_DIR):
+        for file in files:
+            if file.endswith(".md") or file.endswith(".mdx"):
+                file_path = Path(root) / file
+                tasks.append(process_file(file_path))
     
-    return all_chunks
+    # 3. Process concurrently
+    # Chunking tasks to avoid rate limits
+    chunk_size = 5
+    for i in range(0, len(tasks), chunk_size):
+        batch = tasks[i:i + chunk_size]
+        await asyncio.gather(*batch)
+        print(f"Processed batch {i // chunk_size + 1}")
 
 if __name__ == "__main__":
-    print("Creating Qdrant collection...")
-    qdrant_manager.create_collection()
-    
-    print("Processing markdown files...")
-    chunks = process_markdown_files()
-    
-    print(f"Adding {len(chunks)} chunks to Qdrant...")
-    if chunks:
-        qdrant_manager.add_chunks(chunks)
-        print("Data ingestion complete!")
-    else:
-        print("No chunks to add")
+    asyncio.run(main())

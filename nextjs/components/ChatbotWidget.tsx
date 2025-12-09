@@ -51,17 +51,17 @@ export function ChatbotWidget() {
       })
 
       const data = await response.json()
-      
+
       if (!sessionId) {
-        setSessionId(data.session_id)
+        setSessionId(data.session_id || data.id)
       }
 
       const botMessage: Message = {
-        role: "assistant",
-        content: data.response,
+        role: "assistant", // "assistant"
+        content: data.content, // Backend returns "content"
         sources: data.sources
       }
-      
+
       setMessages(prev => [...prev, botMessage])
     } catch (error) {
       const errorMessage: Message = {
@@ -105,7 +105,7 @@ export function ChatbotWidget() {
           <X className="h-4 w-4" />
         </Button>
       </CardHeader>
-      
+
       <CardContent className="flex-1 flex flex-col p-4">
         <div className="flex-1 overflow-y-auto space-y-4 mb-4">
           {messages.length === 0 && (
@@ -113,18 +113,17 @@ export function ChatbotWidget() {
               Ask me anything about Physical AI and Robotics!
             </div>
           )}
-          
+
           {messages.map((message, index) => (
             <div
               key={index}
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                  message.role === "user"
+                className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${message.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
-                }`}
+                  }`}
               >
                 {message.content}
                 {message.sources && message.sources.length > 0 && (
@@ -135,7 +134,7 @@ export function ChatbotWidget() {
               </div>
             </div>
           ))}
-          
+
           {loading && (
             <div className="flex justify-start">
               <div className="bg-muted rounded-lg px-3 py-2">
@@ -143,10 +142,10 @@ export function ChatbotWidget() {
               </div>
             </div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
-        
+
         <div className="flex gap-2">
           <input
             type="text"
