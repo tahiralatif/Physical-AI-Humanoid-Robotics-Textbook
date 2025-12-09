@@ -1,41 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
 from app.database import get_db
-from app.models import User, UserProfile
-from app.auth import get_password_hash, verify_password, create_access_token
-import re
+from app.models import User, Session as DbSession, UserProfile
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-class SignupRequest(BaseModel):
-    email: EmailStr
-    password: str
-    python_level: str = None
-    ros_experience: str = None
-    linux_familiarity: str = None
-    hardware_access: str = None
-    learning_goal: str = None
-
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
-
-class AuthResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    user_id: int
-    email: str
-
-def validate_password(password: str):
-    if len(password) < 8:
-        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
-    if not re.search(r"[A-Z]", password):
-        raise HTTPException(status_code=400, detail="Password must contain uppercase letter")
-    if not re.search(r"[a-z]", password):
-        raise HTTPException(status_code=400, detail="Password must contain lowercase letter")
-    if not re.search(r"\d", password):
-        raise HTTPException(status_code=400, detail="Password must contain number")
+class ProfileCreate(BaseModel):
+    python_level: str
+    ros_experience: str
+    linux_familiarity: str
+    hardware_access: str
+    learning_goal: str
 
 def classify_expertise(python_level: str, ros_experience: str) -> str:
     if python_level in ["beginner", "none"] or ros_experience in ["none", "beginner"]:
@@ -45,70 +24,87 @@ def classify_expertise(python_level: str, ros_experience: str) -> str:
     else:
         return "Intermediate"
 
-@router.post("/signup", response_model=AuthResponse)
-async def signup(request: SignupRequest, response: Response, db: Session = Depends(get_db)):
-    validate_password(request.password)
+async def get_current_user(request: Request, db: Session = Depends(get_db)):
+    # Better Auth stores session token in cookie
+    # Cookie name is usually 'better-auth.session_token' 
+    token = request.cookies.get("better-auth.session_token")
     
-    existing_user = db.query(User).filter(User.email == request.email).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+    if not token:
+        # Fallback to Authorization header if provided
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
     
-    user = User(
-        email=request.email,
-        password_hash=get_password_hash(request.password)
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    
-    expertise_level = classify_expertise(
-        request.python_level or "beginner",
-        request.ros_experience or "none"
-    )
-    
-    profile = UserProfile(
-        user_id=user.id,
-        python_level=request.python_level,
-        ros_experience=request.ros_experience,
-        linux_familiarity=request.linux_familiarity,
-        hardware_access=request.hardware_access,
-        learning_goal=request.learning_goal,
-        expertise_level=expertise_level
-    )
-    db.add(profile)
-    db.commit()
-    
-    access_token = create_access_token(data={"sub": str(user.id), "email": user.email})
-    
-    # Set HTTP-only cookie
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        samesite="lax",
-        max_age=60*60*24*7  # 7 days
-    )
-    
-    return AuthResponse(
-        access_token=access_token,
-        user_id=user.id,
-        email=user.email
-    )
-
-@router.post("/login", response_model=AuthResponse)
-async def login(request: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == request.email).first()
-    if not user or not verify_password(request.password, user.password_hash):
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password"
+            detail="Not authenticated"
         )
+        
+    # Verify session in DB
+    # Note: If Better Auth uses hashed tokens, we might need verify logic.
+    # Assuming direct token match for now based on standard session tables.
+    session = db.query(DbSession).filter(DbSession.id == token).first()
     
-    access_token = create_access_token(data={"sub": str(user.id), "email": user.email})
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid session"
+        )
+        
+    if session.expiresAt < datetime.now(session.expiresAt.tzinfo):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session expired"
+        )
+        
+    user = db.query(User).filter(User.id == session.userId).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
+        
+    return user
+
+@router.post("/profile")
+async def create_profile(
+    profile: ProfileCreate, 
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    # Check if profile exists
+    existing_profile = db.query(UserProfile).filter(UserProfile.user_id == user.id).first()
+    if existing_profile:
+        return {"message": "Profile already exists", "expertise_level": existing_profile.expertise_level}
+
+    expertise_level = classify_expertise(profile.python_level, profile.ros_experience)
     
-    return AuthResponse(
-        access_token=access_token,
+    new_profile = UserProfile(
         user_id=user.id,
-        email=user.email
+        python_level=profile.python_level,
+        ros_experience=profile.ros_experience,
+        linux_familiarity=profile.linux_familiarity,
+        hardware_access=profile.hardware_access,
+        learning_goal=profile.learning_goal,
+        expertise_level=expertise_level
     )
+    
+    db.add(new_profile)
+    db.commit()
+    db.refresh(new_profile)
+    
+    return {
+        "message": "Profile created successfully",
+        "expertise_level": expertise_level,
+        "profile_id": str(new_profile.profile_id)
+    }
+
+@router.get("/me")
+async def get_me(user: User = Depends(get_current_user)):
+    return {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "emailVerified": user.emailVerified
+    }

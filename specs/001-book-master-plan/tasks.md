@@ -25,9 +25,9 @@
 
 ## Phase 2: Foundational
 
-*   [ ] T014 Implement Better Auth integration for signup/signin in `nextjs/` and `fastapi/`
-*   [ ] T015 Implement secure HTTP-only cookie session management for authentication in `fastapi/`
-*   [ ] T016 Integrate Next.js App Router middleware for auth checks in `nextjs/middleware.ts`
+*   [x] T014 Implement Better Auth integration for signup/signin in `nextjs/` and `fastapi/`
+*   [x] T015 Implement secure HTTP-only cookie session management for authentication in `fastapi/`
+*   [x] T016 Integrate Next.js App Router middleware for auth checks in `nextjs/middleware.ts`
 *   [x] T017 Set up GitHub Actions for Docusaurus deployment to GitHub Pages/Vercel
 *   [ ] T018 Set up GitHub Actions for Next.js/FastAPI deployment to Vercel
 
