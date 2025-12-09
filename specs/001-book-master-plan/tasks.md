@@ -13,11 +13,11 @@
 *   [x] T002 Create base project directories and initialize Next.js in `nextjs/`
 *   [x] T003 Create base project directories and initialize FastAPI in `fastapi/`
 *   [x] T004 Set up `uv` package manager for FastAPI project `fastapi/`
-*   [ ] T005 Configure Tailwind CSS and shadcn/ui for Next.js project `nextjs/`
+*   [x] T005 Configure Tailwind CSS and shadcn/ui for Next.js project `nextjs/`
 *   [x] T006 Initialize Git repository and link to GitHub (if not already)
 *   [x] T007 Configure initial `.env` files for Docusaurus, Next.js, FastAPI with placeholder values
-*   [ ] T008 Provision Neon Serverless Postgres database and obtain connection string
-*   [ ] T009 Provision Qdrant Cloud Free Tier and obtain API key/URL
+*   [x] T008 Provision Neon Serverless Postgres database and obtain connection string
+*   [x] T009 Provision Qdrant Cloud Free Tier and obtain API key/URL
 *   [x] T010 Create `users` and `user_profiles` tables in Neon Postgres based on schema in `spec.md`
 *   [x] T011 Create `chat_messages` and `conversation_sessions` tables in Neon Postgres based on schema in `spec.md`
 *   [x] T012 Create `personalized_content` and `translated_chapters` tables in Neon Postgres based on schema in `spec.md`
