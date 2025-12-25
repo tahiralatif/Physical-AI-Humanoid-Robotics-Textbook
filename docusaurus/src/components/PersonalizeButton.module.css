@@ -1,0 +1,47 @@
+.container {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.button {
+  background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(58, 123, 213, 0.3);
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.badge {
+  background: rgba(58, 123, 213, 0.1);
+  color: #3a7bd5;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(58, 123, 213, 0.2);
+}
+
+.resetLink {
+  background: none;
+  border: none;
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}

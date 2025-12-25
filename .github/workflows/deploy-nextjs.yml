@@ -1,0 +1,45 @@
+name: Deploy Next.js to Vercel
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: nextjs/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./nextjs
+        run: npm ci
+
+      - name: Run build
+        working-directory: ./nextjs
+        run: npm run build
+        env:
+          NEXT_PUBLIC_BETTER_AUTH_URL: ${{ secrets.NEXT_PUBLIC_BETTER_AUTH_URL }}
+          NEXT_PUBLIC_BETTER_AUTH_CLIENT_KEY: ${{ secrets.NEXT_PUBLIC_BETTER_AUTH_CLIENT_KEY }}
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-args: '--prod'
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./nextjs

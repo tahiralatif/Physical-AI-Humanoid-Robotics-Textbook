@@ -1,0 +1,21 @@
+.button {
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans Arabic', sans-serif;
+}
+
+.button:hover {
+  background: var(--ifm-color-emphasis-300);
+}
+
+.active {
+  background: #2e7d32;
+  color: white;
+  border-color: #1b5e20;
+}

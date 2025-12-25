@@ -72,6 +72,29 @@ npm run build
 
 The build artifacts will be stored in the `build/` directory.
 
+## 🤖 Context7 Documentation Integration
+
+This project is integrated with Context7 MCP server for enhanced documentation access:
+
+1.  **Install the Context7 client** (if using an AI assistant that supports MCP):
+    The `.mcp.json` configuration enables access to up-to-date library documentation.
+
+2.  **Set up the API token**:
+    ```bash
+    # Add to your environment
+    export CONTEXT7_API_TOKEN="your-context7-api-token"
+    ```
+
+3.  **Access documentation**:
+    When using AI-powered development tools, Context7 provides real-time access to documentation for:
+    - FastAPI
+    - Next.js
+    - Docusaurus
+    - Tailwind CSS
+    - shadcn/ui
+    - Better Auth
+    - And other libraries used in this project
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

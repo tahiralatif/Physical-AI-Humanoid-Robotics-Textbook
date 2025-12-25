@@ -1,104 +1,108 @@
-# Implementation Plan: [FEATURE]
+# Plan: Physical AI & Humanoid Robotics Textbook Project
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Feature**: 001-book-master-plan
+**Date**: 2025-12-18
+**Spec**: specs/001-book-master-plan/spec.md
+**Tasks**: specs/001-book-master-plan/tasks.md
 
-**Note**: This template is filled in by the `/sp.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+---
 
-## Summary
+## 1. Architectural Overview
 
-[Extract from feature spec: primary requirement + technical approach from research]
+The system is designed as a **Hybrid AI-Native Application**, combining a static documentation site with dynamic AI services.
 
-## Technical Context
+### Components
+1.  **Frontend (The Book)**:
+    -   **Tech**: Docusaurus 3 (React-based SSG).
+    -   **Host**: GitHub Pages.
+    -   **Role**: Displays textbook content, integrates Chatbot Widget and Personalization Controls.
+2.  **Backend (The Intelligence)**:
+    -   **Tech**: FastAPI (Python).
+    -   **Role**: Handles RAG pipeline, Auth, Personalization logic, and Translation services.
+    -   **Host**: Vercel (or similar for Python serverless) / Render.
+3.  **Database Layer**:
+    -   **Relational**: Neon Serverless Postgres (Users, Profiles, Logs).
+    -   **Vector**: Qdrant Cloud (Embeddings for RAG).
+4.  **AI Services**:
+    -   **LLM**: OpenAI (GPT-4o / GPT-4o-mini).
+    -   **Agents**: ChatKit SDKs / OpenAI Agents API.
+    -   **Development Subagents**: Custom Claude Code agents defined in `.claude/agents/` to handle specific domains (Documentation, Frontend, Backend).
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+---
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+## 2. Technical Stack & Key Decisions
 
-## Constitution Check
+### A. Book Engine: Docusaurus
+-   **Why**: Optimized for documentation, supports MDX (React in Markdown), easy to extend with Spec-Kit Plus.
+-   **Customization**: Custom React components for "Personalize" and "Translate" buttons injected via Swizzling or MDX components.
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+### B. Chatbot Pipeline (RAG)
+-   **Ingestion**: Python script parses `.md` files -> chunks -> OpenAI Embeddings -> Qdrant.
+-   **Retrieval**: `qdrant-client` searches for relevant chunks based on user query + text selection context.
+-   **Generation**: OpenAI Chat Completion API generates answer with citations.
 
-[Gates determined based on constitution file]
+### C. Authentication & Personalization
+-   **Auth**: **Better-Auth** (seamless integration with Next.js/FastAPI).
+-   **Profile**: Stored in Neon. Fields: `expertise_level` (Beginner/Expert), `hardware` (Sim-only/Jetson/Robot), `goals`.
+-   **Personalization Logic**:
+    -   Fetch original chapter markdown.
+    -   Prompt LLM: "Rewrite this section for a [Beginner] who has [No Robot]..."
+    -   Cache result in Postgres `personalized_content` table to reduce latency/cost.
 
-## Project Structure
+---
 
-### Documentation (this feature)
+## 3. Data Flow
 
-```text
-specs/[###-feature]/
-├── plan.md              # This file (/sp.plan command output)
-├── research.md          # Phase 0 output (/sp.plan command)
-├── data-model.md        # Phase 1 output (/sp.plan command)
-├── quickstart.md        # Phase 1 output (/sp.plan command)
-├── contracts/           # Phase 1 output (/sp.plan command)
-└── tasks.md             # Phase 2 output (/sp.tasks command - NOT created by /sp.plan)
-```
+### Chatbot Query
+1.  User types query in Docusaurus Widget.
+2.  Frontend sends JSON `{query, selected_text, session_id}` to FastAPI.
+3.  FastAPI converts `query` to vector.
+4.  Qdrant returns Top-K chunks.
+5.  FastAPI constructs prompt with Context + History.
+6.  LLM generates response.
+7.  Response sent back to Frontend.
 
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+### Content Personalization
+1.  User Clicks "Personalize".
+2.  Frontend checks JWT status.
+3.  Request sent to `POST /api/personalize/{chapter_id}`.
+4.  Backend checks Cache.
+    -   *Hit*: Return cached HTML/Markdown.
+    -   *Miss*: Call LLM -> Store in DB -> Return.
+5.  Frontend renders new content dynamically.
 
-```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+---
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+## 4. Implementation Strategy
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+### Step 1: Foundation (Setup)
+-   Initialize Repo.
+-   Setup Docusaurus skeleton.
+-   Setup FastAPI skeleton.
+-   Provision Databases.
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
+### Step 2: Content (The Core)
+-   Write Spec-Kit Plus driven content for all 4 Modules.
+-   Ensure structured Frontmatter for metadata.
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
+### Step 3: Intelligence (Chatbot)
+-   Build Ingestion Script.
+-   Build Chat API.
+-   Create Chat Widget component.
 
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
-```
+### Step 4: Engagement (Bonus)
+-   Implement Auth & Survey.
+-   Implement Personalization & Translation APIs.
+-   Integrate "Bonus" UI toggles in Docusaurus.
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+### Step 5: Agentic Acceleration
+-   Define subagents in `.claude/agents/` (e.g., `rag-architect`, `docusaurus-expert`).
+-   Utilize these agents for repetitive or specialized tasks throughout the development lifecycle.
 
-## Complexity Tracking
+---
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+## 5. Verification Plan
+-   **Build Check**: `npm run build` passes for Docusaurus.
+-   **Deployment**: Site accessible on GitHub Pages.
+-   **RAG Accuracy**: Query "What is ROS 2?" returns accurate definition from Module 1.
+-   **Bonus**: Login, Personalize Chapter 1, Switch to Urdu -> Verify changes.

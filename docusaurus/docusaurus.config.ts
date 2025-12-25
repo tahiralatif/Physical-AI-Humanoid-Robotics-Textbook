@@ -19,12 +19,12 @@ const config: Config = {
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   // For Vercel/Netlify deployment, use '/'
-  baseUrl: '/',
+  baseUrl: '/Physical-AI-Humanoid-Robotics-Textbook/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'tahiralatif', // Usually your GitHub org/user name.
-  projectName: 'physical-ai-humanoid-roboticsMake', // Usually your repo name.
+  projectName: 'Physical-AI-Humanoid-Robotics-Textbook', // Usually your repo name.
 
   onBrokenLinks: 'throw',
 

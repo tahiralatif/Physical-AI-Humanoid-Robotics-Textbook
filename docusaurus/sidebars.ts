@@ -66,6 +66,7 @@ const sidebars: SidebarsConfig = {
     'hardware-setup/digital-twin-workstation',
     'hardware-setup/physical-ai-edge-kit',
     'hardware-setup/cloud-native-setup',
+    'hardware-setup/checklists',
   ],
 
   assessmentsSidebar: [
