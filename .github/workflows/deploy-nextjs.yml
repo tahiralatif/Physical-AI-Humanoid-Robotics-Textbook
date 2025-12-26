@@ -34,6 +34,7 @@ jobs:
         env:
           NEXT_PUBLIC_BETTER_AUTH_URL: ${{ secrets.NEXT_PUBLIC_BETTER_AUTH_URL }}
           NEXT_PUBLIC_BETTER_AUTH_CLIENT_KEY: ${{ secrets.NEXT_PUBLIC_BETTER_AUTH_CLIENT_KEY }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
