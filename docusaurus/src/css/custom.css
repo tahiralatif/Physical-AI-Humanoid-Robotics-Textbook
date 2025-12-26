@@ -1,0 +1,195 @@
+/**
+ * Modern Design System for Physical AI & Humanoid Robotics Textbook
+ * Futuristic AI/Robotics theme with smooth animations and premium aesthetics
+ */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* Urdu/RTL Support for Right-to-Left Text */
+:root {
+  --urdu-font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'Arial Unicode MS', sans-serif;
+  --urdu-code-font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+}
+
+/* Light Mode - Modern AI/Robotics Theme */
+:root {
+  /* Primary Colors - Deep Blue */
+  --ifm-color-primary: #2563eb;
+  --ifm-color-primary-dark: #1d4ed8;
+  --ifm-color-primary-darker: #1e40af;
+  --ifm-color-primary-darkest: #1e3a8a;
+  --ifm-color-primary-light: #3b82f6;
+  --ifm-color-primary-lighter: #60a5fa;
+  --ifm-color-primary-lightest: #93c5fd;
+
+  /* Accent Colors */
+  --accent-cyan: #06b6d4;
+  --accent-teal: #14b8a6;
+  --accent-purple: #8b5cf6;
+  --accent-pink: #ec4899;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  --gradient-accent: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  --gradient-hero: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #06b6d4 100%);
+
+  /* Typography */
+  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --ifm-heading-font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --ifm-font-weight-bold: 600;
+  --ifm-code-font-size: 95%;
+  --ifm-heading-font-weight: 700;
+
+  /* Spacing and Effects */
+  --ifm-global-radius: 0.75rem;
+  --docusaurus-highlighted-code-line-bg: rgba(37, 99, 235, 0.1);
+
+  /* Smooth transitions */
+  --ifm-transition-fast: 150ms;
+  --ifm-transition-slow: 300ms;
+}
+
+/* Dark Mode - Enhanced Premium Theme */
+[data-theme='dark'] {
+  /* Primary Colors - Vibrant Blue/Cyan */
+  --ifm-color-primary: #60a5fa;
+  --ifm-color-primary-dark: #3b82f6;
+  --ifm-color-primary-darker: #2563eb;
+  --ifm-color-primary-darkest: #1d4ed8;
+  --ifm-color-primary-light: #93c5fd;
+  --ifm-color-primary-lighter: #bfdbfe;
+  --ifm-color-primary-lightest: #dbeafe;
+
+  /* Accent Colors - More vibrant in dark mode */
+  --accent-cyan: #22d3ee;
+  --accent-teal: #2dd4bf;
+  --accent-purple: #a78bfa;
+  --accent-pink: #f472b6;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-accent: linear-gradient(135deg, #06b6d4 0%, #a78bfa 100%);
+  --gradient-hero: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #06b6d4 100%);
+
+  /* Dark mode backgrounds */
+  --ifm-background-color: #0f172a;
+  --ifm-background-surface-color: #1e293b;
+
+  --docusaurus-highlighted-code-line-bg: rgba(96, 165, 250, 0.15);
+}
+
+/* Global Smooth Transitions */
+* {
+  transition: background-color var(--ifm-transition-fast) ease-in-out,
+              border-color var(--ifm-transition-fast) ease-in-out,
+              color var(--ifm-transition-fast) ease-in-out;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* RTL Support for Urdu Text */
+.translated-content[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+  font-family: var(--urdu-font-family);
+  line-height: 1.8;
+  font-size: 1.1em;
+  unicode-bidi: embed;
+}
+
+.translated-content[dir="rtl"] h1,
+.translated-content[dir="rtl"] h2,
+.translated-content[dir="rtl"] h3,
+.translated-content[dir="rtl"] h4,
+.translated-content[dir="rtl"] h5,
+.translated-content[dir="rtl"] h6 {
+  font-family: var(--urdu-font-family);
+  text-align: right;
+  direction: rtl;
+}
+
+.translated-content[dir="rtl"] p {
+  text-align: right;
+  direction: rtl;
+  margin: 1em 0;
+}
+
+.translated-content[dir="rtl"] ul,
+.translated-content[dir="rtl"] ol {
+  text-align: right;
+  direction: rtl;
+  padding-right: 20px;
+  margin-right: 0;
+}
+
+.translated-content[dir="rtl"] li {
+  text-align: right;
+  direction: rtl;
+}
+
+.translated-content[dir="rtl"] blockquote {
+  border-right: 4px solid var(--ifm-color-primary);
+  border-left: none;
+  margin-right: 0;
+  margin-left: 1rem;
+  padding-right: 1rem;
+  padding-left: 0;
+  text-align: right;
+  direction: rtl;
+}
+
+.translated-content[dir="rtl"] code {
+  font-family: var(--urdu-code-font-family);
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+.translated-content[dir="rtl"] pre {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+}
+
+.translated-content[dir="rtl"] pre code {
+  direction: ltr;
+  text-align: left;
+}
+
+/* RTL support for tables */
+.translated-content[dir="rtl"] table {
+  text-align: right;
+  direction: rtl;
+}
+
+.translated-content[dir="rtl"] table th,
+.translated-content[dir="rtl"] table td {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Custom styling for translation section */
+.translate-section {
+  background-color: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-primary-lighter);
+  border-radius: var(--ifm-global-radius);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.translate-section h3 {
+  color: var(--ifm-color-primary);
+  margin-top: 0;
+  font-family: var(--ifm-heading-font-family);
+}
+
+/* Button styling for translation buttons */
+.translate-section .button {
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}

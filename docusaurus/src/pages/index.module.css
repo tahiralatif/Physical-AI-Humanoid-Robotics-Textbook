@@ -1,0 +1,363 @@
+/**
+ * Modern Animated Home Page Styles
+ * Premium AI-Powered Design with Advanced Visual Effects
+ */
+
+/* Hero Banner - Premium Animated Background with Particles */
+.heroBanner {
+  padding: 10rem 2rem 8rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: #0a0e27;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #0f1729 50%, #1e2139 75%, #0a0e27 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 20s ease infinite;
+}
+
+[data-theme='light'] .heroBanner {
+  background: linear-gradient(135deg, #1e40af 0%, #7c3aed 25%, #0891b2 50%, #6366f1 75%, #1e40af 100%);
+  background-size: 400% 400%;
+}
+
+/* Animated gradient movement */
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  25% {
+    background-position: 100% 50%;
+  }
+
+  50% {
+    background-position: 50% 100%;
+  }
+
+  75% {
+    background-position: 50% 0%;
+  }
+}
+
+/* Neural Network Particle Effect Background */
+.heroBanner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(96, 165, 250, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 50%);
+  animation: particleFloat 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes particleFloat {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+/* Glowing Grid Pattern Overlay */
+.heroBanner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(96, 165, 250, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridPulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes gridPulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.heroBanner>* {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero Title - Premium Gradient with Glow */
+.heroTitle {
+  font-size: 4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #60a5fa 50%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.8s ease-out, titleGlow 3s ease-in-out infinite;
+  text-shadow: 0 0 40px rgba(96, 165, 250, 0.3);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+[data-theme='light'] .heroTitle {
+  background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #0891b2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes titleGlow {
+
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+/* Hero Subtitle with Typing Effect */
+.heroSubtitle {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 1rem;
+  font-weight: 400;
+  animation: fadeInUp 1s ease-out;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='light'] .heroSubtitle {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Fade in and slide up animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Buttons Container */
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 2.5rem;
+  animation: fadeInUp 1.2s ease-out;
+}
+
+/* Premium Primary CTA Button with Neon Effect */
+.primaryButton {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: #ffffff;
+  border: none;
+  padding: 1.25rem 3rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 0 30px rgba(96, 165, 250, 0.4),
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.primaryButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.primaryButton:hover::before {
+  left: 100%;
+}
+
+.primaryButton:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 0 50px rgba(96, 165, 250, 0.6),
+    0 15px 50px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.primaryButton:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* Secondary CTA Button - Glassmorphism with Glow */
+.secondaryButton {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  padding: 1.25rem 3rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border-radius: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 0 20px rgba(139, 92, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+}
+
+.secondaryButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(139, 92, 246, 0.6);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 0 40px rgba(139, 92, 246, 0.4),
+    0 15px 40px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.secondaryButton:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* Hero Illustration - 3D Float with Glow */
+.heroIllustration {
+  max-width: 700px;
+  margin: 4rem auto 0;
+  animation: floating3D 6s ease-in-out infinite;
+  filter: drop-shadow(0 30px 60px rgba(96, 165, 250, 0.3));
+  perspective: 1000px;
+}
+
+.heroIllustration img {
+  width: 100%;
+  height: auto;
+  border-radius: 2rem;
+  animation: imageGlow 4s ease-in-out infinite;
+}
+
+/* 3D Floating animation */
+@keyframes floating3D {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotateY(0deg);
+  }
+
+  25% {
+    transform: translateY(-20px) rotateY(2deg);
+  }
+
+  50% {
+    transform: translateY(-30px) rotateY(0deg);
+  }
+
+  75% {
+    transform: translateY(-20px) rotateY(-2deg);
+  }
+}
+
+@keyframes imageGlow {
+
+  0%,
+  100% {
+    filter: brightness(1) saturate(1);
+  }
+
+  50% {
+    filter: brightness(1.1) saturate(1.2);
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 6rem 1.5rem 4rem;
+  }
+
+  .heroTitle {
+    font-size: 2.75rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.25rem;
+  }
+
+  .heroIllustration {
+    max-width: 500px;
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .heroBanner {
+    padding: 4rem 1rem 3rem;
+  }
+
+  .heroTitle {
+    font-size: 2rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1rem;
+  }
+
+  .buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    max-width: 320px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+
+  .heroIllustration {
+    max-width: 100%;
+    margin-top: 2rem;
+  }
+}
